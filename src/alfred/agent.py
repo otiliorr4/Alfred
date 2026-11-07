@@ -10,7 +10,7 @@ class AlfredAgent:
         register_default_tools()
 
     def process_message(self, message):
-        return self.model.generate_response(
+        return self.model.generate_response_with_tools(
             instructions=self.system_prompt,
             message=message,
         )
