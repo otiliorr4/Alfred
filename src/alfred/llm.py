@@ -40,8 +40,8 @@ class OpenAIModel:
 
         llamada = llamadas[0]
 
-        # Por ahora, solo autorizamos esta herramienta.
-        if llamada.name != "obtener_estado_pc":
+        # Herramientas autorizadas
+        if llamada.name not in ("obtener_estado_pc", "abrir_programa"):
             return "La herramienta solicitada no está autorizada."
 
         try:
@@ -49,8 +49,14 @@ class OpenAIModel:
         except (json.JSONDecodeError, TypeError):
             return "El modelo generó argumentos inválidos."
 
-        if argumentos != {}:
-            return "La herramienta recibió argumentos no permitidos."
+        # Validar los argumentos según la herramienta
+        if llamada.name == "obtener_estado_pc":
+            if argumentos != {}:
+                return "Argumentos no permitidos para obtener_estado_pc."
+
+        elif llamada.name == "abrir_programa":
+            if argumentos != {"nombre": "bloc_de_notas"}:
+                return "Programa o argumentos no autorizados."
 
         funcion = get_tool(llamada.name)
 
@@ -58,7 +64,7 @@ class OpenAIModel:
             return "No se encontró la herramienta solicitada."
 
         try:
-            resultado = funcion()
+            resultado = funcion(**argumentos)
         except Exception:
             return "Ocurrió un error al ejecutar la herramienta."
 
