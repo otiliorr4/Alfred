@@ -41,7 +41,11 @@ class OpenAIModel:
         llamada = llamadas[0]
 
         # Herramientas autorizadas
-        if llamada.name not in ("obtener_estado_pc", "abrir_programa"):
+        if llamada.name not in (
+            "obtener_estado_pc",
+            "abrir_programa",
+            "abrir_pagina_web",
+        ):
             return "La herramienta solicitada no está autorizada."
 
         try:
@@ -54,9 +58,13 @@ class OpenAIModel:
             if argumentos != {}:
                 return "Argumentos no permitidos para obtener_estado_pc."
 
-        elif llamada.name == "abrir_programa":
-            if argumentos != {"nombre": "bloc_de_notas"}:
-                return "Programa o argumentos no autorizados."
+        elif llamada.name == "abrir_pagina_web":
+            if (
+                not isinstance(argumentos, dict)
+                or set(argumentos) != {"nombre"}
+                or argumentos["nombre"] not in ("youtube", "google", "github")
+            ):
+                return "Página web o argumentos no autorizados."
 
         funcion = get_tool(llamada.name)
 

@@ -36,4 +36,26 @@ TOOL_DEFINITIONS = [
         },
         "strict": True,
     },
+    {
+    "type": "function",
+    "name": "abrir_pagina_web",
+    "description": (
+        "Abre una página web autorizada en el navegador "
+        "predeterminado del usuario. Puede abrir YouTube, "
+        "Google o GitHub."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "nombre": {
+                "type": "string",
+                "enum": ["youtube", "google", "github"],
+                "description": "Nombre de la página web que se abrirá.",
+            }
+        },
+        "required": ["nombre"],
+        "additionalProperties": False,
+    },
+    "strict": True,
+    },
 ]
