@@ -5,6 +5,7 @@ from alfred.tools.registry import get_tool
 from alfred.tools.tool_definitions import TOOL_DEFINITIONS
 from dotenv import load_dotenv
 from openai import OpenAI
+from alfred.tools.validation import validar_argumentos
 
 
 load_dotenv()
@@ -41,31 +42,13 @@ class OpenAIModel:
         llamada = llamadas[0]
 
         # Herramientas autorizadas
-        if llamada.name not in (
-            "obtener_estado_pc",
-            "abrir_programa",
-            "abrir_pagina_web",
-        ):
-            return "La herramienta solicitada no está autorizada."
-
         try:
-            argumentos = json.loads(llamada.arguments)
-        except (json.JSONDecodeError, TypeError):
-            return "El modelo generó argumentos inválidos."
-
-        # Validar los argumentos según la herramienta
-        if llamada.name == "obtener_estado_pc":
-            if argumentos != {}:
-                return "Argumentos no permitidos para obtener_estado_pc."
-
-        elif llamada.name == "abrir_pagina_web":
-            if (
-                not isinstance(argumentos, dict)
-                or set(argumentos) != {"nombre"}
-                or argumentos["nombre"] not in ("youtube", "google", "github")
-            ):
-                return "Página web o argumentos no autorizados."
-
+            argumentos = validar_argumentos(
+                llamada.name,
+                llamada.arguments,
+            )
+        except ValueError as error:
+            return f"No puedo ejecutar la herramienta: {error}"
         funcion = get_tool(llamada.name)
 
         if funcion is None:
