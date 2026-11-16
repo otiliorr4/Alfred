@@ -1,11 +1,10 @@
 import os
 import json
 
-from alfred.tools.registry import get_tool
 from alfred.tools.tool_definitions import TOOL_DEFINITIONS
 from dotenv import load_dotenv
 from openai import OpenAI
-from alfred.tools.validation import validar_argumentos
+from alfred.tools.execution import ejecutar_herramienta
 
 
 load_dotenv()
@@ -42,22 +41,17 @@ class OpenAIModel:
         llamada = llamadas[0]
 
         # Herramientas autorizadas
-        try:
-            argumentos = validar_argumentos(
-                llamada.name,
-                llamada.arguments,
+        ejecucion = ejecutar_herramienta(
+            llamada.name,
+            llamada.arguments,
+        )
+
+        if not ejecucion["ok"]:
+            return (
+                f"No pude ejecutar {llamada.name}: "
+                f"{ejecucion['error']}"
             )
-        except ValueError as error:
-            return f"No puedo ejecutar la herramienta: {error}"
-        funcion = get_tool(llamada.name)
 
-        if funcion is None:
-            return "No se encontró la herramienta solicitada."
-
-        try:
-            resultado = funcion(**argumentos)
-        except Exception:
-            return "Ocurrió un error al ejecutar la herramienta."
 
         respuesta_final = self.client.responses.create(
             model=self.model,
@@ -66,7 +60,7 @@ class OpenAIModel:
             input=[{
                 "type": "function_call_output",
                 "call_id": llamada.call_id,
-                "output": json.dumps(resultado),
+                "output": json.dumps(ejecucion),
             }],
             tools=TOOL_DEFINITIONS,
             parallel_tool_calls=False,
