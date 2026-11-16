@@ -10,11 +10,8 @@ def abrir_programa(nombre):
     comando = PROGRAMAS_PERMITIDOS.get(nombre.strip().lower())
 
     if comando is None:
-        return f"Programa no permitido: {nombre}"
+        raise ValueError(f"Programa no permitido: {nombre}")
 
-    try:
-        subprocess.Popen(comando)
-        return f"Se solicitó abrir: {nombre}"
+    subprocess.Popen(comando)
 
-    except OSError as error:
-        return f"No se pudo abrir {nombre}: {error}"
+    return f"Se solicitó abrir: {nombre}"

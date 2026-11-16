@@ -12,15 +12,13 @@ def abrir_pagina_web(nombre):
     pagina = PAGINAS_PERMITIDAS.get(nombre.strip().lower())
 
     if pagina is None:
-        return f"Página no permitida: {nombre}"
+        raise ValueError(f"Página no permitida: {nombre}")
 
-    try:
-        resultado = webbrowser.open(pagina)
+    resultado = webbrowser.open(pagina)
 
-        if resultado:
-            return f"Se solicitó abrir: {nombre}"
+    if not resultado:
+        raise RuntimeError(
+            f"No se pudo solicitar abrir: {nombre}"
+        )
 
-        return f"No se pudo solicitar abrir: {nombre}"
-
-    except (OSError, webbrowser.Error) as error:
-        return f"Error al abrir {nombre}: {error}"
+    return f"Se solicitó abrir: {nombre}"
