@@ -27,12 +27,40 @@ def ejecutar_herramienta(nombre, argumentos_json):
     try:
         resultado = funcion(**argumentos)
 
-    except Exception:
-        logger.exception("Error ejecutando herramienta: %s", nombre)
+    except ValueError:
+        logger.exception("Solicitud inválida: %s", nombre)
 
         return {
             "ok": False,
-            "error": "Error interno al ejecutar la herramienta.",
+            "codigo": "SOLICITUD_INVALIDA",
+            "error": "La solicitud no está permitida.",
+        }
+
+    except OSError:
+        logger.exception("Error del sistema: %s", nombre)
+
+        return {
+            "ok": False,
+            "codigo": "ERROR_SISTEMA",
+            "error": "El sistema operativo no pudo completar la acción.",
+        }
+
+    except RuntimeError:
+        logger.exception("Fallo de operación: %s", nombre)
+
+        return {
+            "ok": False,
+            "codigo": "OPERACION_FALLIDA",
+            "error": "No se pudo completar la operación solicitada.",
+        }
+
+    except Exception:
+        logger.exception("Error inesperado: %s", nombre)
+
+        return {
+            "ok": False,
+            "codigo": "ERROR_INTERNO",
+            "error": "Ocurrió un error interno al ejecutar la herramienta.",
         }
 
     return {
