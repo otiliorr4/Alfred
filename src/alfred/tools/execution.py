@@ -13,6 +13,7 @@ def ejecutar_herramienta(nombre, argumentos_json):
     except ValueError as error:
         return {
             "ok": False,
+            "codigo": "VALIDACION_FALLIDA",
             "error": str(error),
         }
 
@@ -21,6 +22,7 @@ def ejecutar_herramienta(nombre, argumentos_json):
     if funcion is None:
         return {
             "ok": False,
+            "codigo": "HERRAMIENTA_NO_REGISTRADA",
             "error": "Herramienta no registrada.",
         }
 
